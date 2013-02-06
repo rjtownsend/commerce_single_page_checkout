@@ -1,1 +1,4 @@
 name = Commerce Single Page Checkout
+description = Provides a single page, single click checkout experience. 
+core = 7.x
+package = Commerce (contrib)
