@@ -2,3 +2,8 @@ name = Commerce Single Page Checkout
 description = Provides a single page, single click checkout experience. 
 core = 7.x
 package = Commerce (contrib)
+
+dependencies[] = commerce
+dependencies[] = commerce_authnet
+dependencies[] = commerce_cart
+dependencies[] = commerce_product
