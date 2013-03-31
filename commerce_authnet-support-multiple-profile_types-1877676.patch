@@ -1,0 +1,30 @@
+diff --git a/commerce_authnet.module b/commerce_authnet.module
+index 2246c2d..2a97e8d 100644
+--- a/commerce_authnet.module
++++ b/commerce_authnet.module
+@@ -396,9 +396,23 @@ function commerce_authnet_aim_submit_form_submit($payment_method, $pane_form, $p
+     'x_customer_ip' => substr(ip_address(), 0, 15),
+   );
+ 
++  // Post address data from all declared profile types
++  $modules = module_implements('commerce_customer_profile_type_info');
++  foreach ($modules as $module) {     
++    if (module_hook($module, 'commerce_customer_profile_type_info')) {
++      $profile_types = module_invoke($module, 'commerce_customer_profile_type_info');
++      foreach ($profile_types as $type => $profile_type) {
++        $type = 'commerce_customer_'.$type;
++        if ($order_wrapper->$type->value()) {
++            $profile_type_id = $type;
++        }
++      }
++    }
++  }
++
+   // Prepare the billing address for use in the request.
+-  if ($order_wrapper->commerce_customer_billing->value()){
+-    $billing_address = $order_wrapper->commerce_customer_billing->commerce_customer_address->value();
++  if ($order_wrapper->$profile_type_id->value()){
++    $billing_address = $order_wrapper->$profile_type_id->commerce_customer_address->value();
+ 
+     if (empty($billing_address['first_name'])) {
+       $name_parts = explode(' ', $billing_address['name_line']);
