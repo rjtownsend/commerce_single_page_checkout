@@ -46,10 +46,5 @@ Create Admin Page to configure:
   * Disable commerce_cart_attributes_refresh_alter
   * Disable rules
 
-Add hook_commerce_spc_line_item_type hook
-  * users can pass product_types that checkout_page should be displayed on
-
-Configur button and other options on $checkout_pages
-
-Update the ajax url for the rule to include node nide
+Redo the ajax url for the rule to pass node nid instead of doing a node_load to get it
 
