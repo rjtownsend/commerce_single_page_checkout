@@ -35,7 +35,7 @@ Installation
 TODO
 ====
 
-Add hook_commerce_checkout_router()
+Use hook_commerce_checkout_router() instead of hook_commerce_checkout_page_info_alter()
   * redirect to confirmation checkout page after checkout
   * Will fix issue that requires "completion" checkout page as last page
 
@@ -45,6 +45,3 @@ Create Admin Page to configure:
   * Empty cart before adding product to cart
   * Disable commerce_cart_attributes_refresh_alter
   * Disable rules
-
-Redo the ajax url for the rule to pass node $node instead of doing a node_load to get it
-
