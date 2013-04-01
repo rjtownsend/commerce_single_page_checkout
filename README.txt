@@ -46,5 +46,5 @@ Create Admin Page to configure:
   * Disable commerce_cart_attributes_refresh_alter
   * Disable rules
 
-Redo the ajax url for the rule to pass node nid instead of doing a node_load to get it
+Redo the ajax url for the rule to pass node $node instead of doing a node_load to get it
 

@@ -31,7 +31,7 @@ function commerce_spc_rules_node_has_enabled_product_type() {
   // TODO: Update the ajax url to include the node nid, otherwise this returns false
   $is_not_type = NULL;
 
-  // I don't like the way I did this
+  // I feel like there's a better way to do this
   $nid = (arg(0) == 'node' && is_numeric(arg(1)))?arg(1):FALSE;
   if ($nid != FALSE) {
     $node = node_load($nid); 
