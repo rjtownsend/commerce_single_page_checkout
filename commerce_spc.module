@@ -18,15 +18,14 @@ function commerce_spc_commerce_checkout_pane_info_alter(&$panes) {
 }
 /**
  * Array of products spc should be implemented on
- * TODO: Hook so other modules can add product types
  *
- * @param
+ * @param node object
  *
  * @return
  *   Array of product types on which spc should be enabled
  */
 function commerce_spc_enabled_product_types($node) {  // Return an array of all commerce products
-  $fields = field_info_fields();  $products_enabled = array();   foreach ($fields as $key => $value) {    $field_type = 'commerce_product_reference';     if ($value['type'] == $field_type) {      $arr = array($value['field_name']);      $products_enabled = array_merge((array)$products_enabled, (array)$arr);     }  }  // TODO: Remove product types from other modules	  // Create an array of product_reference items attached to a node.	  $products_added = array();  foreach ($node->content as $key => $value) {    if (is_array($value)) {      if (array_key_exists('#field_type', $value)) {        $field_type = $value['#field_type'];        if (($field_type == 'commerce_product_reference')) {          $items = field_get_items('node', $node, $key, $langcode = NULL);          $products_added = array(            $key => $items,          );        }      }    }  }  // If a product added to the node has been enabled as a product type  $enabled = FALSE;   foreach ($products_added as $key => $value) {    if (in_array ($key, $products_enabled)) {      $enabled = TRUE;     }  }  return $enabled;
+  $fields = field_info_fields();  $products_enabled = array();   foreach ($fields as $key => $value) {    $field_type = 'commerce_product_reference';     if ($value['type'] == $field_type) {      $arr = array($value['field_name']);      $products_enabled = array_merge((array)$products_enabled, (array)$arr);     }  }  // Create an array of product_reference items attached to a node.	  $products_added = array();  foreach ($node->content as $key => $value) {    if (is_array($value)) {      if (array_key_exists('#field_type', $value)) {        $field_type = $value['#field_type'];        if (($field_type == 'commerce_product_reference')) {          $items = field_get_items('node', $node, $key, $langcode = NULL);          $products_added = array(            $key => $items,          );        }      }    }  }  // If a product added to the node has been enabled as a product type  $enabled = FALSE;   foreach ($products_added as $key => $value) {    if (in_array ($key, $products_enabled)) {      $enabled = TRUE;     }  }  return $enabled;
 }/**
  * Implements hook_node_view.
  *

@@ -5,8 +5,10 @@
  */
 
 /*
- * @TODO: This causes the features admin to break when commerce_features is enabled.
+ * Implements hook_default_rules_configuration_alter()
  */
 function commerce_spc_default_rules_configuration_alter(&$configs) {
-  $configs['commerce_cart_add_to_cart_message']->condition('commerce_current_node_has_enabled_product_type');
+  if (isset($configs['commerce_cart_add_to_cart_message'])) {
+    $configs['commerce_cart_add_to_cart_message']->condition('commerce_current_node_has_enabled_product_type');
+  }
 }
