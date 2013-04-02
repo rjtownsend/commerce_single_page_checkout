@@ -25,14 +25,13 @@ function commerce_spc_rules_condition_info() {
 }
 
 /**
- * Rules condition: checks to see if current node is of a specific
- * content type. 
+ * Rules condition: checks to see if current node is a specific content type. 
  */
 function commerce_spc_rules_node_has_enabled_product_type() {
   // I feel like there's a better way to do this.
   $is_not_type = NULL;
 
-  $nid = (arg(0) == 'node' && is_numeric(arg(1))) ? arg(1): FALSE;
+  $nid = (arg(0) == 'node' && is_numeric(arg(1))) ? arg(1) : FALSE;
   if ($nid != FALSE) {
     $node = node_load($nid);
     $node->content = node_view(node_load($nid));
