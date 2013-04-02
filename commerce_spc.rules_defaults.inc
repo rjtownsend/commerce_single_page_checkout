@@ -4,7 +4,7 @@
  * Default rule configurations for Commerce Single Page Checkout.
  */
 
-/*
+/**
  * Implements hook_default_rules_configuration_alter()
  *
  * Set the condition in the add_to_cart rule if a node has a
