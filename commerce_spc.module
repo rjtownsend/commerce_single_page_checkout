@@ -15,7 +15,7 @@
 function commerce_spc_commerce_checkout_pane_info_alter(&$panes) {
   $panes['customer_profile_spc_billing']['page'] = 'commerce_spc';
   $panes['customer_profile_spc_billing']['weight'] = 3;
-}
+}
 /**
  * Array of products spc should be implemented on
  *
@@ -82,7 +82,7 @@ function commerce_spc_commerce_cart_attributes_refresh_alter(&$commands, $form, 
   // Ajax command to update the cart
   $cart =  commerce_embed_view('commerce_cart_summary', 'default', array($order->order_id));
   $commands[] = ajax_command_replace('.view-commerce-cart-summary', $cart);
-}/** * Help function. Get order ID from user */function commerce_spc_get_order() {  $order = NULL;   global $user;	  if (!commerce_cart_order_session_exists()) {    $order = commerce_cart_order_new($user->uid);    $order->log = t('Created by loading checkout page.');    commerce_cart_order_session_save($order->order_id);  } else {    $order = commerce_cart_order_load($user->uid);   }  return $order; }
+}/** * Help function. Get order ID from user */function commerce_spc_get_order() {  $order = NULL;   global $user;	  if (!commerce_cart_order_session_exists()) {    $order = commerce_cart_order_new($user->uid);    $order->log = t('Created by loading checkout page.');    commerce_cart_order_session_save($order->order_id);  } else {    $order = commerce_cart_order_load($user->uid);   }  return $order; }
 /**
  * Helper function. Return array of product_reference items attached to a node. *  * @return nested array of all commerce_product_reference fields on a specific node
  */
@@ -97,6 +97,6 @@ function commerce_spc_get_items($node) {
         }
       }
     }
-  }
+  }
   return $keyed_items;
 }
