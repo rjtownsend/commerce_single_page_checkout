@@ -5,7 +5,7 @@
  */
 
 /**
- * Implements hook_default_rules_configuration_alter()
+ * Implements hook_default_rules_configuration_alter().
  *
  * Set the condition in the add_to_cart rule if a node has a
  * product attached to it.
