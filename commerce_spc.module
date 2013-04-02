@@ -39,7 +39,6 @@ function commerce_spc_commerce_checkout_page_info() {
  *
  * TODO: commerce_spc_commerce_checkout_router() should really be used to
  * redirect this page to the checkout completion page.
- *
  */
 function commerce_spc_commerce_checkout_page_info_alter(&$pages) {
   // Make sure checkout page comes before completion.
@@ -127,9 +126,11 @@ function commerce_spc_commerce_checkout_pane_info_alter(&$panes) {
 /**
  * Array of products spc should be implemented on.
  *
- * @param node object.
+ * @param $node 
+ * Node object.
  *
- * @return Array of product types on which spc should be enabled.
+ * @return 
+ * TRUE if an enabled product type is referenced with the node.
  */
 function commerce_spc_enabled_product_types($node) {
   // Return an array of all commerce products.
@@ -139,7 +140,7 @@ function commerce_spc_enabled_product_types($node) {
   foreach ($fields as $key => $value) {
     if ($value['type'] == $field_type) {
       $arr = array($value['field_name']);
-      $products_enabled = array_merge((array)$products_enabled, (array)$arr);
+      $products_enabled = array_merge((array) $products_enabled, (array) $arr);
     }
   }
 
@@ -193,7 +194,7 @@ function commerce_spc_node_view($node, $view_mode, $langcode) {
     }
     commerce_cart_product_add_by_id($product_id, $quantity = 1, $combine = TRUE, $order->uid);
 
-    // Set checkout_page, this needs to happen after the product is added to the cart.
+    // Set checkout_page, needs to happen after the product is added to cart.
     // This file needs to be included. Is there a better way to do this?
     $path = drupal_get_path('module', 'commerce_checkout');
     include_once $path . '/includes/commerce_checkout.pages.inc';
@@ -229,7 +230,7 @@ function commerce_spc_commerce_cart_attributes_refresh_alter(&$commands, $form, 
   // Add the default product_id to the cart.
   // TODO: variable set in admin to not fire this.
   $order = commerce_spc_get_order();
-  // TODO: Preferably this should remove the last added product, not empty the cart.
+  // TODO: This should remove the last added product, not empty the cart.
   commerce_cart_order_empty($order);
   $product_id = $form['product_id']['#default_value'];
   commerce_cart_product_add_by_id($product_id, $quantity = 1, $combine = TRUE, $user->uid);
@@ -261,8 +262,8 @@ function commerce_spc_get_order() {
 /**
  * Helper function. Return array of product_reference items attached to a node.
  *
- * @return nested array of all commerce_product_reference fields on a
- * specific node.
+ * @return 
+ * Nested array of all commerce_product_reference fields on a node.
  */
 function commerce_spc_get_items($node) {
   $keyed_items[] = NULL;
