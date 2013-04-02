@@ -126,10 +126,10 @@ function commerce_spc_commerce_checkout_pane_info_alter(&$panes) {
 /**
  * Array of products spc should be implemented on.
  *
- * @param $node
+ * @param Drupal\node\Node $node
  *   Node object.
  *
- * @return bool $enabled
+ * @return bool
  *   TRUE if an enabled product type is referenced with the node.
  */
 function commerce_spc_enabled_product_types($node) {
@@ -262,7 +262,7 @@ function commerce_spc_get_order() {
 /**
  * Helper function. Return array of product_reference items attached to a node.
  *
- * @return array $keyed_items
+ * @return array
  *   Nested array of all commerce_product_reference fields on a node.
  */
 function commerce_spc_get_items($node) {
