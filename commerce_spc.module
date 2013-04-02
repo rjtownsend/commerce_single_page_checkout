@@ -30,19 +30,21 @@ function commerce_spc_commerce_checkout_page_info() {
 }
 
 /**
- * Implements hook_commerce_checkout_page_info_alter()
+ * Implements hook_commerce_checkout_page_info_alter().
  *
- * Checks the weights of other checkout pages and readjusts this weight so it always comes last.
- * This is (currently) necessary so this checkout_page doens't fire during "normal" checkout
- * because we place it after all the other checkout_pages, including when payment is processed.
+ * Checks the weights of other checkout pages and readjusts this weight so
+ * it always comes last. This is (currently) necessary so this checkout_page
+ * doens't fire during "normal" checkout because we place it after all the
+ * other checkout_pages, including when payment is processed.
  *
- * TODO: commerce_spc_commerce_checkout_router() should really be used to redirect this page to the checkout completion page.
+ * TODO: commerce_spc_commerce_checkout_router() should really be used to
+ * redirect this page to the checkout completion page.
  *
  * @param $pages
  *   All the pages that have been defined.
  */
 function commerce_spc_commerce_checkout_page_info_alter(&$pages) {
-  // Make sure checkout page comes before completion
+  // Make sure checkout page comes before completion.
   foreach ($pages as $key => $page) {
     if ($key == 'complete') {
       $my_weight = $page['weight'] - 1;
@@ -52,15 +54,15 @@ function commerce_spc_commerce_checkout_page_info_alter(&$pages) {
 }
 
 /**
- * Implementation of hook_commerce_customer_profile_type_info
+ * Implementation of hook_commerce_customer_profile_type_info().
  *
  * This also duplicates the Billing information pane, which we'll
- * need to override in hook_commerce_checkout_pane_info_alter()
+ * need to override in hook_commerce_checkout_pane_info_alter().
  */
 function commerce_spc_commerce_customer_profile_type_info() {
   $profile_types = array();
 
-  // This creates a related billing pane with addressfields
+  // This creates a related billing pane with addressfields.
   $profile_types['spc_billing'] = array(
     'type' => 'spc_billing',
     'name' => t('SPC Billing Information'),
@@ -73,7 +75,7 @@ function commerce_spc_commerce_customer_profile_type_info() {
 }
 
 /**
- * Implements hook_commerce_checkout_pane_info()
+ * Implements hook_commerce_checkout_pane_info().
  *
  * This is where we define the name of the pane, related information, and
  * the base name of all the form builder functions used to present the
@@ -125,15 +127,16 @@ function commerce_spc_commerce_checkout_pane_info_alter(&$panes) {
 }
 
 /**
- * Array of products spc should be implemented on
+ * Array of products spc should be implemented on.
  *
- * @param node object
+ * @param $node
+ *   node object.
  *
  * @return
- *   Array of product types on which spc should be enabled
+ *   Array of product types on which spc should be enabled.
  */
 function commerce_spc_enabled_product_types($node) {
-  // Return an array of all commerce products
+  // Return an array of all commerce products.
   $fields = field_info_fields();
   $field_type = 'commerce_product_reference';
   $products_enabled = array();
@@ -160,7 +163,7 @@ function commerce_spc_enabled_product_types($node) {
     }
   }
 
-  // If a product added to the node has been enabled as a product type
+  // If a product added to the node has been enabled as a product type.
   $enabled = FALSE;
   foreach ($products_added as $key => $value) {
     if (in_array ($key, $products_enabled)) {
@@ -182,11 +185,11 @@ function commerce_spc_node_view($node, $view_mode, $langcode) {
   $enabled = commerce_spc_enabled_product_types($node);
 
   if ($enabled) {
-    // Add product to cart. First, get cart
-    // TODO: variable "add products on first view" through adnmin
+    // Add product to cart. First, get cart.
+    // TODO: variable "add products on first view" through adnmin.
     $order = commerce_spc_get_order();
-    // Empty cart
-    // TODO: variable in admin to optionally empty cart
+    // Empty cart.
+    // TODO: variable in admin to optionally empty cart.
     commerce_cart_order_empty($order);
     // Add first product in node->product_reference array to cart
     $items = commerce_spc_get_items($node);
@@ -195,11 +198,11 @@ function commerce_spc_node_view($node, $view_mode, $langcode) {
     }
     commerce_cart_product_add_by_id($product_id, $quantity = 1, $combine = TRUE, $order->uid);
 
-    // Set checkout_page, this needs to happen after the product is added to the cart
+    // Set checkout_page, this needs to happen after the product is added to the cart.
     // This file needs to be included. Is there a better way to do this?
     $path = drupal_get_path('module', 'commerce_checkout');
     include_once $path . '/includes/commerce_checkout.pages.inc';
-    // Begin adding items
+    // Begin adding items.
     $checkout_pages = commerce_checkout_pages();
     $checkout_page = $checkout_pages['commerce_spc'];
     $form = drupal_get_form('commerce_checkout_form_' . $checkout_page['page_id'], $order, $checkout_page);
@@ -209,9 +212,9 @@ function commerce_spc_node_view($node, $view_mode, $langcode) {
 }
 
 /**
- * Implements hook_form_alter()
+ * Implements hook_form_alter().
  *
- * Remove submit button
+ * Remove submit button.
  */
 function commerce_spc_form_alter(&$form, &$form_state, $form_id) {
   if (strstr($form_id, 'commerce_cart_add_to_cart_form')) {
@@ -220,28 +223,28 @@ function commerce_spc_form_alter(&$form, &$form_state, $form_id) {
 }
 
 /**
- * Implements hook_commerce_cart_attributes_refresh_alter()
+ * Implements hook_commerce_cart_attributes_refresh_alter().
  *
  * Adds additional functions and AJAX commands whenever a product reference field is changed.
- * Empty cart and then add products depending on product selected
+ * Empty cart and then add products depending on product selected.
  */
 function commerce_spc_commerce_cart_attributes_refresh_alter(&$commands, $form, $form_state) {
   global $user;
-  // Add the default product_id to the cart
-  // TODO: variable set in admin to not fire this
+  // Add the default product_id to the cart.
+  // TODO: variable set in admin to not fire this.
   $order = commerce_spc_get_order();
-  // TODO: Preferably this should remove the last added product, not empty the cart
+  // TODO: Preferably this should remove the last added product, not empty the cart.
   commerce_cart_order_empty($order);
   $product_id = $form['product_id']['#default_value'];
   commerce_cart_product_add_by_id($product_id, $quantity = 1, $combine = TRUE, $user->uid);
 
-  // Ajax command to update the cart
+  // Ajax command to update the cart.
   $cart =  commerce_embed_view('commerce_cart_summary', 'default', array($order->order_id));
   $commands[] = ajax_command_replace('.view-commerce-cart-summary', $cart);
 }
 
 /**
- * Help function. Get order ID from user
+ * Helper function. Get order ID from user.
  */
 function commerce_spc_get_order() {
   $order = NULL;
@@ -261,7 +264,7 @@ function commerce_spc_get_order() {
 /**
  * Helper function. Return array of product_reference items attached to a node.
  *
- * @return nested array of all commerce_product_reference fields on a specific node
+ * @return nested array of all commerce_product_reference fields on a specific node.
  */
 
 function commerce_spc_get_items($node) {
