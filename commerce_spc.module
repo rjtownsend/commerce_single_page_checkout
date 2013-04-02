@@ -1,4 +1,85 @@
-<?php/** * @file * Used to add a single-page checkout to commerce. *//** * Implements hook_commerce_checkout_page_info(). * * Define the custom checkout page and related information. * * @link http://www.drupalcommerce.org/node/224 explains hook_commerce_checkout_page_info @endlink */function commerce_spc_commerce_checkout_page_info() {  $pages['commerce_spc'] = array(    'name' => t('Single Page Checkout'),    'title' => t('Single Page Checkout'),    'weight' => 49,    'status_cart' => FALSE,    // If 'buttons' is FALSE the next and previous buttons will be omitted.    'buttons' => TRUE,    // The value of the "next" button for this page. Defaults to 'Continue'.    'submit_value' => t('Buy Now'),    // The value of the "previous" button for this page. Defaults to 'Back'    'back_value' => NULL,  );    return $pages;}/** * Implements hook_commerce_checkout_page_info_alter(). * * Checks the weights of other checkout pages and readjusts this weight so it always comes last. * This is (currently) necessary so this checkout_page doens't fire during "normal" checkout * because we place it after all the other checkout_pages, including when payment is processed. *  * TODO: commerce_spc_commerce_checkout_router() should really be used to redirect this page to the checkout completion page.  * * @param $pages *   All the pages that have been defined. */function commerce_spc_commerce_checkout_page_info_alter(&$pages) {  // Make sure checkout page comes before completion.   foreach ($pages as $key => $page) {    if ($key == 'complete') {      $my_weight = $page['weight'] - 1;    }  }  $pages['commerce_spc']['weight'] = $my_weight;}/** * Implementation of hook_commerce_customer_profile_type_info *  * This also duplicates the Billing information pane, which we'll  * need to override in hook_commerce_checkout_pane_info_alter().  */function commerce_spc_commerce_customer_profile_type_info() {  $profile_types = array();  // This creates a related billing pane with addressfields  $profile_types['spc_billing'] = array(    'type' => 'spc_billing',    'name' => t('SPC Billing Information'),    'description' => t('Required Profile Type so we can have multiple Billing Checkout Panes'),    'help' => '',    'addressfield' => TRUE,  );   return $profile_types;}/** * Implements hook_commerce_checkout_pane_info(). * * This is where we define the name of the pane, related information, and * the base name of all the form builder functions used to present the * pane. */function commerce_spc_commerce_checkout_pane_info() {
+<?php
+/**
+ * @file
+ * Used to add a single-page checkout to commerce.
+ */
+
+/**
+ * Implements hook_commerce_checkout_page_info().
+ *
+ * Define the custom checkout page and related information.
+ *
+ * @link http://www.drupalcommerce.org/node/224 explains hook_commerce_checkout_page_info @endlink
+ */
+function commerce_spc_commerce_checkout_page_info() {
+  $pages['commerce_spc'] = array(
+    'name' => t('Single Page Checkout'),
+    'title' => t('Single Page Checkout'),
+    'weight' => 49,
+    'status_cart' => FALSE,
+
+    // If 'buttons' is FALSE the next and previous buttons will be omitted.
+    'buttons' => TRUE,
+    // The value of the "next" button for this page. Defaults to 'Continue'
+    'submit_value' => t('Buy Now'),
+    // The value of the "previous" button for this page. Defaults to 'Back'
+    'back_value' => NULL,
+  );
+
+  return $pages;
+}
+
+/**
+ * Implements hook_commerce_checkout_page_info_alter()
+ *
+ * Checks the weights of other checkout pages and readjusts this weight so it always comes last.
+ * This is (currently) necessary so this checkout_page doens't fire during "normal" checkout
+ * because we place it after all the other checkout_pages, including when payment is processed.
+ *
+ * TODO: commerce_spc_commerce_checkout_router() should really be used to redirect this page to the checkout completion page.
+ *
+ * @param $pages
+ *   All the pages that have been defined.
+ */
+function commerce_spc_commerce_checkout_page_info_alter(&$pages) {
+  // Make sure checkout page comes before completion
+  foreach ($pages as $key => $page) {
+    if ($key == 'complete') {
+      $my_weight = $page['weight'] - 1;
+    }
+  }
+  $pages['commerce_spc']['weight'] = $my_weight;
+}
+
+/**
+ * Implementation of hook_commerce_customer_profile_type_info
+ *
+ * This also duplicates the Billing information pane, which we'll
+ * need to override in hook_commerce_checkout_pane_info_alter()
+ */
+function commerce_spc_commerce_customer_profile_type_info() {
+  $profile_types = array();
+
+  // This creates a related billing pane with addressfields
+  $profile_types['spc_billing'] = array(
+    'type' => 'spc_billing',
+    'name' => t('SPC Billing Information'),
+    'description' => t('Required Profile Type so we can have multiple Billing Checkout Panes'),
+    'help' => '',
+    'addressfield' => TRUE,
+  );
+
+  return $profile_types;
+}
+
+/**
+ * Implements hook_commerce_checkout_pane_info()
+ *
+ * This is where we define the name of the pane, related information, and
+ * the base name of all the form builder functions used to present the
+ * pane.
+ */
+function commerce_spc_commerce_checkout_pane_info() {
   $path = drupal_get_path('module', 'commerce_cart');
   include_once $path . '/includes/commerce_cart.checkout_pane.inc';
 
@@ -6,16 +87,43 @@
   include_once $path . '/includes/commerce_payment.checkout_pane.inc';
 
   $path = drupal_get_path('module', 'commerce_order');
-  include_once $path . '/includes/commerce_order.checkout_pane.inc';    $panes['commerce_spc_shopping_carts'] = array(    'title' => t('SPC Shopping cart contents'),    'base' => 'commerce_cart_contents_pane',    'page' => 'commerce_spc',    'weight' => 1,  );  $panes['commerce_spc_account_information'] = array(    'title' => t('SPC Account information'),    'base' => 'commerce_order_account_pane',    'page' => 'commerce_spc',    'weight' => 2,  );  $panes['commerce_spc_payment'] = array(    'title' => t('SPC Payment'),    'base' => 'commerce_payment_pane',    'page' => 'commerce_spc',    'weight' => 4,  );    return $panes;}
+  include_once $path . '/includes/commerce_order.checkout_pane.inc';
+
+  $panes['commerce_spc_shopping_carts'] = array(
+    'title' => t('SPC Shopping cart contents'),
+    'base' => 'commerce_cart_contents_pane',
+    'page' => 'commerce_spc',
+    'weight' => 1,
+  );
+
+  $panes['commerce_spc_account_information'] = array(
+    'title' => t('SPC Account information'),
+    'base' => 'commerce_order_account_pane',
+    'page' => 'commerce_spc',
+    'weight' => 2,
+  );
+
+  $panes['commerce_spc_payment'] = array(
+    'title' => t('SPC Payment'),
+    'base' => 'commerce_payment_pane',
+    'page' => 'commerce_spc',
+    'weight' => 4,
+  );
+
+  return $panes;
+}
 
 /**
  * Implements hook_commerce_checkout_pane_info_alter().
  *
- * The SPC Billing pane is created with the profile type.  * We need to override some settings from that pane here.  */
+ * The SPC Billing pane is created with the profile type.
+ * We need to override some settings from that pane here.
+ */
 function commerce_spc_commerce_checkout_pane_info_alter(&$panes) {
   $panes['customer_profile_spc_billing']['page'] = 'commerce_spc';
   $panes['customer_profile_spc_billing']['weight'] = 3;
 }
+
 /**
  * Array of products spc should be implemented on
  *
@@ -24,14 +132,56 @@ function commerce_spc_commerce_checkout_pane_info_alter(&$panes) {
  * @return
  *   Array of product types on which spc should be enabled
  */
-function commerce_spc_enabled_product_types($node) {  // Return an array of all commerce products  $fields = field_info_fields();  $field_type = 'commerce_product_reference';  $products_enabled = array();  foreach ($fields as $key => $value) {    if ($value['type'] == $field_type) {      $arr = array($value['field_name']);      $products_enabled = array_merge((array)$products_enabled, (array)$arr);     }  }  // Create an array of product_reference items attached to a node.	  $products_added = array();  foreach ($node->content as $key => $value) {    if (is_array($value)) {      if (array_key_exists('#field_type', $value)) {        $field_type = $value['#field_type'];        if (($field_type == 'commerce_product_reference')) {          $items = field_get_items('node', $node, $key, $langcode = NULL);          $products_added = array(            $key => $items,          );        }      }    }  }  // If a product added to the node has been enabled as a product type  $enabled = FALSE;   foreach ($products_added as $key => $value) {    if (in_array ($key, $products_enabled)) {      $enabled = TRUE;     }  }  return $enabled;
-}/**
+function commerce_spc_enabled_product_types($node) {
+  // Return an array of all commerce products
+  $fields = field_info_fields();
+  $field_type = 'commerce_product_reference';
+  $products_enabled = array();
+  foreach ($fields as $key => $value) {
+    if ($value['type'] == $field_type) {
+      $arr = array($value['field_name']);
+      $products_enabled = array_merge((array)$products_enabled, (array)$arr);
+    }
+  }
+
+  // Create an array of product_reference items attached to a node.
+  $products_added = array();
+  foreach ($node->content as $key => $value) {
+    if (is_array($value)) {
+      if (array_key_exists('#field_type', $value)) {
+        $field_type = $value['#field_type'];
+        if (($field_type == 'commerce_product_reference')) {
+          $items = field_get_items('node', $node, $key, $langcode = NULL);
+          $products_added = array(
+            $key => $items,
+          );
+        }
+      }
+    }
+  }
+
+  // If a product added to the node has been enabled as a product type
+  $enabled = FALSE;
+  foreach ($products_added as $key => $value) {
+    if (in_array ($key, $products_enabled)) {
+      $enabled = TRUE;
+    }
+  }
+
+  return $enabled;
+}
+
+/**
  * Implements hook_node_view.
  *
  * Adds the commerce_spc checkout_page form to the node array.
  *
  */
-function commerce_spc_node_view($node, $view_mode, $langcode) {	  // Does this node have an enabled product type?  $enabled = commerce_spc_enabled_product_types($node);    if ($enabled) {
+function commerce_spc_node_view($node, $view_mode, $langcode) {
+  // Does this node have an enabled product type?
+  $enabled = commerce_spc_enabled_product_types($node);
+
+  if ($enabled) {
     // Add product to cart. First, get cart
     // TODO: variable "add products on first view" through adnmin
     $order = commerce_spc_get_order();
@@ -39,7 +189,10 @@ function commerce_spc_node_view($node, $view_mode, $langcode) {	  // Does this n
     // TODO: variable in admin to optionally empty cart
     commerce_cart_order_empty($order);
     // Add first product in node->product_reference array to cart
-    $items = commerce_spc_get_items($node);    foreach ($items as $key => $value) {      $product_id = $value[0]['product_id'];     }
+    $items = commerce_spc_get_items($node);
+    foreach ($items as $key => $value) {
+      $product_id = $value[0]['product_id'];
+    }
     commerce_cart_product_add_by_id($product_id, $quantity = 1, $combine = TRUE, $order->uid);
 
     // Set checkout_page, this needs to happen after the product is added to the cart
@@ -51,7 +204,8 @@ function commerce_spc_node_view($node, $view_mode, $langcode) {	  // Does this n
     $checkout_page = $checkout_pages['commerce_spc'];
     $form = drupal_get_form('commerce_checkout_form_' . $checkout_page['page_id'], $order, $checkout_page);
     $form['#weight'] = '100';
-    $node->content['commerce_spc'] = $form;  }
+    $node->content['commerce_spc'] = $form;
+  }
 }
 
 /**
@@ -71,8 +225,10 @@ function commerce_spc_form_alter(&$form, &$form_state, $form_id) {
  * Adds additional functions and AJAX commands whenever a product reference field is changed.
  * Empty cart and then add products depending on product selected
  */
-function commerce_spc_commerce_cart_attributes_refresh_alter(&$commands, $form, $form_state) {  global $user;	
-  // Add the default product_id to the cart  // TODO: variable set in admin to not fire this
+function commerce_spc_commerce_cart_attributes_refresh_alter(&$commands, $form, $form_state) {
+  global $user;
+  // Add the default product_id to the cart
+  // TODO: variable set in admin to not fire this
   $order = commerce_spc_get_order();
   // TODO: Preferably this should remove the last added product, not empty the cart
   commerce_cart_order_empty($order);
@@ -82,21 +238,48 @@ function commerce_spc_commerce_cart_attributes_refresh_alter(&$commands, $form, 
   // Ajax command to update the cart
   $cart =  commerce_embed_view('commerce_cart_summary', 'default', array($order->order_id));
   $commands[] = ajax_command_replace('.view-commerce-cart-summary', $cart);
-}/** * Help function. Get order ID from user */function commerce_spc_get_order() {  $order = NULL;   global $user;	  if (!commerce_cart_order_session_exists()) {    $order = commerce_cart_order_new($user->uid);    $order->log = t('Created by loading checkout page.');    commerce_cart_order_session_save($order->order_id);  } else {    $order = commerce_cart_order_load($user->uid);   }  return $order; }
+}
+
 /**
- * Helper function. Return array of product_reference items attached to a node. *  * @return nested array of all commerce_product_reference fields on a specific node
+ * Help function. Get order ID from user
+ */
+function commerce_spc_get_order() {
+  $order = NULL;
+
+  global $user;
+  if (!commerce_cart_order_session_exists()) {
+    $order = commerce_cart_order_new($user->uid);
+    $order->log = t('Created by loading checkout page.');
+    commerce_cart_order_session_save($order->order_id);
+  } else {
+    $order = commerce_cart_order_load($user->uid);
+  }
+
+  return $order;
+}
+
+/**
+ * Helper function. Return array of product_reference items attached to a node.
+ *
+ * @return nested array of all commerce_product_reference fields on a specific node
  */
 
 function commerce_spc_get_items($node) {
-  $keyed_items[] = NULL;  foreach ($node->content as $key => $value) {
+  $keyed_items[] = NULL;
+
+  foreach ($node->content as $key => $value) {
     if (is_array($value)) {
       if (array_key_exists('#field_type', $value)) {
         $field_type = $value['#field_type'];
         if (($field_type == 'commerce_product_reference')) {
-          $items = field_get_items('node', $node, $key, $node->language);          $keyed_items = array(            $key => $items,          );
+          $items = field_get_items('node', $node, $key, $node->language);
+          $keyed_items = array(
+            $key => $items,
+          );
         }
       }
     }
   }
+
   return $keyed_items;
 }
